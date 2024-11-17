@@ -9,18 +9,22 @@ const upload = require("../utils/index");
 const Project = require("../models/project");
 
 // GET /list - Get all projects
-router.get("/list", async (req, res) => {
+router.post("/list", async (req, res) => {
     try {
+        const { isAll } = req.body;
+
+        console.log(req.body, isAll);
         // Fetch all projects from the collection
-        const projects = await Project.find();
+        let projects = await Project.find(isAll ? {} : { is_active: true }).limit(isAll ? 0 : 10);
 
         // Check if no projects found
         if (projects.length === 0) {
             return res.status(404).send({ message: "No projects found" });
         }
 
-        // Return the projects in response
-        return res.status(200).send({ body: projects });
+
+        return res.status(200).json({ body: projects });
+
     } catch (err) {
         // Log the error for debugging
         console.error("Error fetching projects:", err);

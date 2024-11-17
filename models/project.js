@@ -9,6 +9,7 @@ const Project = mongoose.model("projects", new mongoose.Schema({
     objective: { type: String },
     assignment: { type: String },
     outcome: { type: String },
+    link: { type: String },
     created_at: { type: String, default: () => new Date().toISOString() },
     updated_at: { type: String, default: () => new Date().toISOString() },
     details: [{

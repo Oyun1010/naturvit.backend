@@ -144,7 +144,7 @@ router.post("/media/upload", auth, async (req, res) => {
 
             return res.status(200).json({
                 message: "Files uploaded successfully",
-                files: req.files,
+                body: req.files,
             });
         });
     } catch (err) {

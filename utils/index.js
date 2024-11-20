@@ -1,5 +1,4 @@
 const multer = require("multer");
-const path = require("node:path");
 
 const storageConfig = multer.diskStorage({
     destination: "medias",
@@ -11,12 +10,12 @@ const storageConfig = multer.diskStorage({
 });
 
 const fileFilterConfig = function (req, file, cb) {
-    cb(null, true);
-    // if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    //     cb(null, true);
-    // } else {
-    //     cb(null, false);
-    // }
+    const allowedMimeTypes = ["image/png", "image/jpeg", "image/jpg", "video/mp4"];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error("Invalid file type. Only PNG, JPEG, JPG, and MP4 files are allowed."), false); // Reject the file
+    }
 };
 
 const upload = multer({

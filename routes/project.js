@@ -1,6 +1,8 @@
 require('dotenv').config();
-
+const mongoose = require('mongoose');
 const express = require("express");
+const multer = require("multer");
+const fs = require("fs");
 
 const router = express.Router();
 
@@ -100,7 +102,7 @@ router.put("/:id", auth, async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -108,7 +110,6 @@ router.delete("/:id", async (req, res) => {
             return res.status(400).send({ message: "Invalid project ID format" });
         }
 
-        // Find the project by ID and remove it
         const deletedProject = await Project.findByIdAndDelete(id);
 
         if (!deletedProject) {
@@ -122,21 +123,56 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-router.post("/uploadMedia", upload.array("files", 10), async (req, res) => {
+router.post("/media/upload", auth, async (req, res) => {
     try {
+        upload.array("files", 10)(req, res, (err) => {
+            if (err) {
+                if (err instanceof multer.MulterError) {
+                    return res.status(400).json({ message: err.message });
+                }
 
-        console.log("REQUEST: ", req.files);
+                if (err.message === "Invalid file type. Only PNG, JPEG, JPG, and MP4 files are allowed.") {
+                    return res.status(400).json({ message: err.message });
+                }
 
-        if (!req.files) {
-            return res.status(400).send('No file uploaded');
-        }
+                return res.status(500).json({ message: "Internal Server Error" });
+            }
 
-        return res.status(200).send({
-            message: 'File uploaded successfully',
-            body: req.files
+            if (!req.files || req.files.length === 0) {
+                return res.status(400).json({ message: "No files uploaded" });
+            }
+
+            return res.status(200).json({
+                message: "Files uploaded successfully",
+                files: req.files,
+            });
         });
     } catch (err) {
-        console.error("Error deleting project:", err);
+        return res.status(500).send({ message: "Internal Server Error" });
+    }
+});
+
+router.post("/media/delete", auth, async (req, res) => {
+    try {
+        const { filepath } = req.body; // The filename to delete, passed in the request body
+        if (!filepath) {
+            return res.status(400).json({ message: "Filename is required" });
+        }
+
+        fs.unlink(filepath, (err) => {
+            if (err) {
+                console.log("ERROR: ", err)
+                return res.status(400).json({ message: "File does not exist" });
+            }
+            return res.status(200).json({ message: "Success" });
+        });
+
+    } catch (err) {
+        console.log(multer.MulterError);
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ message: err.message });
+        }
+
         return res.status(500).send({ message: "Internal Server Error" });
     }
 });

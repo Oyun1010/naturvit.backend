@@ -18,6 +18,10 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '25mb' }));
 app.use(express.static(__dirname));
 
+app.get('/', (req, res) => {
+    res.send('Connected');
+})
+
 mainRouters(app)
 
 app.listen(process.env.PORT, () => {

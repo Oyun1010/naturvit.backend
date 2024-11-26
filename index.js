@@ -19,7 +19,7 @@ app.use(express.json({ limit: '25mb' }));
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
-    res.send('Connected');
+    res.status(200).json({ message: "success" });
 })
 
 mainRouters(app)

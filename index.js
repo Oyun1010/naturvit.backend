@@ -24,10 +24,6 @@ app.get('/', (req, res) => {
 
 mainRouters(app);
 
-module.exports = (req, res) => {
-    app(req, res);
-};
-
-// app.listen(process.env.PORT, () => {
-//     console.log(`Server running on port ${process.env.PORT}`);
-// })
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on port ${process.env.PORT}`);
+})
